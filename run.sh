@@ -8,9 +8,6 @@ time root -b > an.log 2>&1 <<EOI
 .x compareMCData.C("hTowersHadEt_endcap")
 EOI
 
-
-
-
 time root -b > an.log 2>&1 <<EOI
 .x compareMCData.C("hTowersEmEt_HF")
 EOI
