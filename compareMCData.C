@@ -1,11 +1,14 @@
-void compareMCData(TString suffix="hTowersHadEt_HF"){
+void compareMCData(TString suffix="hTowersHadEt_barrel"){
   
   TFile*f_MC=new TFile("fileMC.root");
+  TFile*f_MC_5TeV=new TFile("fileMC_5TeV.root");
   TFile*f_Data=new TFile("fileData.root");
   TH1F*histo_MC=(TH1F*)f_MC->Get(suffix.Data());
+  TH1F*histo_MC_5TeV=(TH1F*)f_MC_5TeV->Get(suffix.Data());
   TH1F*histo_Data=(TH1F*)f_Data->Get(suffix.Data());
   
 
+  if(!(histo_MC_5TeV->GetEntries()==0)) histo_MC_5TeV->Scale(1./histo_MC_5TeV->GetEntries());
   if(!(histo_MC->GetEntries()==0)) histo_MC->Scale(1./histo_MC->GetEntries());
   if(!(histo_Data->GetEntries()==0)) histo_Data->Scale(1./histo_Data->GetEntries());
 
@@ -35,6 +38,25 @@ void compareMCData(TString suffix="hTowersHadEt_HF"){
   histo_MC->SetLineColor(2); 
   histo_MC->SetLineWidth(3);
   histo_MC->Draw("same");
-  canvas->SaveAs(Form("PlotsPF/%s.pdf",suffix.Data()));
+  
+  histo_MC_5TeV->SetLineColor(4); 
+  histo_MC_5TeV->SetLineWidth(3);
+  histo_MC_5TeV->Draw("same");
+  
+  TLegend* leg= new TLegend(0.57,0.68,0.87,0.88);
+  leg->SetFillColor(0);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->SetTextFont(42);
+  TLegendEntry* ent;
+
+  ent=leg->AddEntry(histo_Data,"DATA","L");
+  ent=leg->AddEntry(histo_MC,"MC","L");
+  ent=leg->AddEntry(histo_MC_5TeV,"MC 5 TeV","L");
+  leg->Draw();
+  
+  canvas->SaveAs(Form("PlotsRecHit/%s.pdf",suffix.Data()));
+  
+  
 
 }

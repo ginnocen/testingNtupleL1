@@ -16,12 +16,13 @@
 #include <iostream>
 
 
-void makeTurnOn(int optionData=true)
+void makeTurnOn(int optionData=true,bool is5TeV=false)
 { 
 
   TString inL1FileName;
-  if(!optionData)inL1FileName="../FilesForL1JetTrigger/HiForest_164_1_s7a.root";
-  else inL1FileName="../FilesForL1JetTrigger/0.root";
+  if(!optionData && !is5TeV)inL1FileName="../FilesForL1JetTrigger/HiForest_164_1_s7a.root";
+  if(!optionData && is5TeV)inL1FileName="../FilesForL1JetTrigger/HiForest_190_2_lPA_5TeV.root";
+  if(optionData)inL1FileName="../FilesForL1JetTrigger/0.root";
   TFile *fFile = TFile::Open(inL1FileName);
   TTree *fTree = (TTree*)fFile->Get("akPu3CaloJetAnalyzer/t");
   TTree *fEvtTree = (TTree*)fFile->Get("hiEvtAnalyzer/HiTree");
@@ -52,7 +53,7 @@ void makeTurnOn(int optionData=true)
   
   Int_t pcollisionEventSelection, pHBHENoiseFilter;
 
-  fTree->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
+  if (!is5TeV) fTree->SetBranchAddress("pcollisionEventSelection",&pcollisionEventSelection);
   fTree->SetBranchAddress("pHBHENoiseFilter",&pHBHENoiseFilter);
 
 
@@ -82,7 +83,7 @@ void makeTurnOn(int optionData=true)
         isHF= (f_eta[l]<-3.0 || f_eta[l]>3.0 );
         isendcap= (f_eta[l]>-3.0 && f_eta[l]<-1.479) || (f_eta[l]>1.479 && f_eta[l]<3);
       
-        if (pcollisionEventSelection==0) continue;
+        if (optionData && pcollisionEventSelection==0) continue;
         if (optionData && pHBHENoiseFilter ==0) continue;
             
          if(f_hadEt[l]>0 && isbarrel){ hTowersHadEt_barrel->Fill(f_hadEt[l]);}
@@ -97,8 +98,11 @@ void makeTurnOn(int optionData=true)
 
 
   TString fout;
+
+  if(!optionData && !is5TeV) fout="fileMC.root";
+  if(!optionData && is5TeV) fout="fileMC_5TeV.root";
   if(optionData) fout="fileData.root";
-  else fout="fileMC.root";
+
   TFile *foutfile=new TFile(fout.Data(),"recreate");
   foutfile->ls();
   
